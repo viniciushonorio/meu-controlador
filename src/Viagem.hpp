@@ -15,6 +15,8 @@ private:
     int distancia;              // km do trecho (vem do trajeto)
 
     int distanciaPercorrida;    // comeca em 0, cresce a cada hora
+    int kmDesdeUltimoDescanso;  // km acumulados desde o último descanso
+    int horasDescansoRestantes; // horas restantes de descanso (0 = viajando)
     int horasEmTransito;        // contador pro relatorio
     bool emAndamento;
     bool finalizada;
