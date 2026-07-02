@@ -2,21 +2,29 @@
 #include "Cidade.hpp"
 #include "Passageiro.hpp"
 #include "Trajeto.hpp"
+#include "Transporte.hpp"
 
 int main() {
-    // Cidades (os objetos "originais" pra onde todos vão apontar)
+    // Cidades
     Cidade natal("Natal");
     Cidade mossoro("Mossoro");
 
-    // Trajeto terrestre de Natal a Mossoro
-    Trajeto t(&natal, &mossoro, 'T', 280);
+    // Transporte terrestre comecando em Natal
+    // (nome, tipo, capacidade, velocidade, distEntreDescansos, tempoDescanso, local)
+    Transporte onibus("Onibus Expresso", 'T', 40, 70, 300, 2, &natal);
 
-    std::cout << "Trajeto: "
-              << t.getOrigem()->getNome()
-              << " -> "
-              << t.getDestino()->getNome()
-              << " | tipo: " << t.getTipo()
-              << " | distancia: " << t.getDistancia() << " km\n";
+    std::cout << "Transporte: " << onibus.getNome()
+              << " | tipo: " << onibus.getTipo()
+              << " | capacidade: " << onibus.getCapacidade()
+              << " | velocidade: " << onibus.getVelocidade() << " km/h\n";
+    std::cout << "Descansa " << onibus.getTempoDescanso()
+              << "h a cada " << onibus.getDistanciaEntreDescansos() << " km\n";
+    std::cout << "Local atual: " << onibus.getLocalAtual()->getNome() << "\n";
+
+    // Simula o efeito de uma viagem: o transporte muda de cidade
+    onibus.setLocalAtual(&mossoro);
+    std::cout << "Apos viajar, local atual: "
+              << onibus.getLocalAtual()->getNome() << "\n";
 
     return 0;
 }
