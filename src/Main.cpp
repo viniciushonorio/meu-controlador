@@ -9,6 +9,7 @@ int main() {
     while (executando) {
         std::cout << "\n=== CONTROLADOR DE VIAGENS ===\n"
                   << "1 - Cadastrar cidade\n"
+                  << "2 - Cadastrar Passageiro\n"
                   << "0 - Sair\n"
                   << "Escolha: ";
 
@@ -20,6 +21,16 @@ int main() {
             std::string nome;
             std::getline(std::cin, nome);
             controlador.cadastrarCidade(nome);
+        } else if (opcao == "2") {
+            std::cout << "Nome do passageiro: ";
+            std::string nome;
+            std::getline(std::cin, nome);
+
+            std::cout << "Cidade onde o passageiro esta: ";
+            std::string cidade;
+            std::getline(std::cin, cidade);
+
+            controlador.cadastrarPassageiro(nome, cidade);
         } else if (opcao == "0") {
             executando = false;
         } else {
