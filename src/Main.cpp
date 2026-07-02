@@ -29,6 +29,7 @@ int main() {
                   << "5 - Iniciar viagem\n"
                   << "6 - Avancar horas\n"
                   << "7 - Relatorio: onde esta cada passageiro\n"
+                  << "8 - Relatorio onde esta cada Transporte\n"
                   << "0 - Sair\n";
         std::string opcao = lerLinha("Escolha: ");
 
@@ -77,6 +78,9 @@ int main() {
 
         } else if (opcao == "7") {
             controlador.relatarPassageiros(); 
+        
+        } else if (opcao == "8") {
+            controlador.relatarTransportes(); 
         
         } else if (opcao == "0") {
             executando = false;

@@ -55,6 +55,8 @@ public:
     // ---- Consultas e relatorios ----
     
     void relatarPassageiros();
+
+    void relatarTransportes();
 };
 
 #endif

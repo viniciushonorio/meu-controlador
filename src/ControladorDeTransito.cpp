@@ -281,10 +281,28 @@ void ControladorDeTransito::relatarPassageiros() {
                       << p->getLocalAtual()->getNome() << "\n";
         } else {
             // Em transito: origem, destino e transporte vem da viagem
-            std::cout << "- " << p->getNome() << ": em transito ("
+            std::cout << "- " << p->getNome() << ": em transito (" << v->getOrigem()->getNome() << " -> " << v->getDestino()->getNome() << ", transporte: " << v->getTransporte()->getNome() << ")\n";
+        }
+    }
+}
+
+void ControladorDeTransito::relatarTransportes() {
+    std::cout << "\n===== ONDE ESTA CADA TRANSPORTE =====\n";
+    if (transportes.empty()) {
+        std::cout << "Nenhum transporte cadastrado.\n";
+        return;
+    }
+    for (Transporte* t : transportes) {
+        Viagem* v = viagemAtivaDoTransporte(t);
+        if (v == nullptr) {
+            std::cout << "- " << t->getNome() << ": em "
+                      << t->getLocalAtual()->getNome() << "\n";
+        } else {
+            std::cout << "- " << t->getNome() << ": em transito ("
                       << v->getOrigem()->getNome() << " -> "
-                      << v->getDestino()->getNome()
-                      << ", transporte: " << v->getTransporte()->getNome() << ")\n";
+                      << v->getDestino()->getNome() << ") ["
+                      << v->getDistanciaPercorrida() << "/"
+                      << v->getDistancia() << " km]\n";
         }
     }
 }
