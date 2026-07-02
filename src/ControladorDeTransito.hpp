@@ -57,6 +57,8 @@ public:
     void relatarPassageiros();
 
     void relatarTransportes();
+
+    void relatarViagensEmAndamento();
 };
 
 #endif

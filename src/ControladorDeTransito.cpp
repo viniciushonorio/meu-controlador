@@ -306,3 +306,36 @@ void ControladorDeTransito::relatarTransportes() {
         }
     }
 }
+
+void ControladorDeTransito::relatarViagensEmAndamento() {
+    std::cout << "\n===== VIAGENS EM ANDAMENTO =====\n";
+
+    bool alguma = false;  // o bilhete: alguem foi impresso?
+
+    for (Viagem* v : viagens) {
+        if (v->isFinalizada()) continue;  // so nos interessam as ativas
+        alguma = true;
+
+        // Linha principal: rota e transporte
+        std::cout << "- " << v->getOrigem()->getNome() << " -> "
+                  << v->getDestino()->getNome()
+                  << " | transporte: " << v->getTransporte()->getNome()
+                  << " | passageiros: ";
+
+        // Lista de nomes separada por virgula (sem virgula no final)
+        const std::vector<Passageiro*>& ps = v->getPassageiros();
+        for (size_t i = 0; i < ps.size(); i++) {
+            std::cout << ps[i]->getNome();
+            if (i + 1 < ps.size()) std::cout << ", ";
+        }
+
+        // Linha secundaria: tempo e progresso
+        std::cout << "\n    horas em transito: " << v->getHorasEmTransito()
+                  << " | progresso: " << v->getDistanciaPercorrida()
+                  << "/" << v->getDistancia() << " km\n";
+    }
+
+    if (!alguma) {
+        std::cout << "Nenhuma viagem em andamento.\n";
+    }
+}

@@ -82,6 +82,9 @@ int main() {
         } else if (opcao == "8") {
             controlador.relatarTransportes(); 
         
+        } else if(opcao == "9") {
+            controlador.relatarViagensEmAndamento();
+            
         } else if (opcao == "0") {
             executando = false;
 
