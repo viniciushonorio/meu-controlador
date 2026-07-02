@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include "ControladorDeTransito.hpp"
 
 // Le uma linha de texto com uma mensagem antes
@@ -25,6 +26,8 @@ int main() {
                   << "2 - Cadastrar passageiro\n"
                   << "3 - Cadastrar trajeto\n"
                   << "4 - Cadastrar transporte\n"
+                  << "5 - Iniciar viagem\n"
+                  << "6 - Avancar horas\n"
                   << "0 - Sair\n";
         std::string opcao = lerLinha("Escolha: ");
 
@@ -53,6 +56,23 @@ int main() {
             std::string local = lerLinha("Cidade onde ele esta: ");
             controlador.cadastrarTransporte(nome, tipo, capacidade, velocidade,
                                             distDescanso, tempoDescanso, local);
+
+        } else if (opcao == "5") {
+            std::string origem = lerLinha("Cidade de origem: ");
+            std::string destino = lerLinha("Cidade de destino: ");
+            std::string transporte = lerLinha("Nome do transporte: ");
+
+            std::vector<std::string> nomes;
+            std::cout << "Passageiros (linha vazia para terminar):\n";
+            while (true) {
+                std::string n = lerLinha("  Nome: ");
+                if (n.empty()) break;
+                nomes.push_back(n);
+            }
+            controlador.iniciarViagem(transporte, nomes, origem, destino);
+
+        } else if (opcao == "6") {
+            controlador.avancarHoras(lerInteiro("Quantas horas avancar? "));
 
         } else if (opcao == "0") {
             executando = false;
