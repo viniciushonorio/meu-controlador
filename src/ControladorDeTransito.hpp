@@ -27,6 +27,11 @@ private:
     Passageiro* buscarPassageiro(const std::string& nome);
     Transporte* buscarTransporte(const std::string& nome);
 
+    // Retorna a cadeia de viagem em andamento que contém o transporte/passageiro
+    // (nullptr se ele não está viajando)
+    Viagem* viagemAtivaDoTransporte(Transporte* t);
+    Viagem* viagemAtivaDoPassageiro(Passageiro* p);
+
 public:
     // ---- Cadastros (retornam false e imprimem erro em caso de falha) ----
     bool cadastrarCidade(const std::string& nome);
@@ -46,6 +51,10 @@ public:
     
     // Avança o tempo de TODAS as viagens em andamento
     void avancarHoras(int horas);
+
+    // ---- Consultas e relatorios ----
+    
+    void relatarPassageiros();
 };
 
 #endif

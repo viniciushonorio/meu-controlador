@@ -28,6 +28,7 @@ int main() {
                   << "4 - Cadastrar transporte\n"
                   << "5 - Iniciar viagem\n"
                   << "6 - Avancar horas\n"
+                  << "7 - Relatorio: onde esta cada passageiro\n"
                   << "0 - Sair\n";
         std::string opcao = lerLinha("Escolha: ");
 
@@ -74,6 +75,9 @@ int main() {
         } else if (opcao == "6") {
             controlador.avancarHoras(lerInteiro("Quantas horas avancar? "));
 
+        } else if (opcao == "7") {
+            controlador.relatarPassageiros(); 
+        
         } else if (opcao == "0") {
             executando = false;
 

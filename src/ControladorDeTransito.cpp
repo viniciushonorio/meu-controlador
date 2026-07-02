@@ -26,6 +26,22 @@ Transporte* ControladorDeTransito::buscarTransporte(const std::string& nome) {
     return nullptr;
 }
 
+Viagem* ControladorDeTransito::viagemAtivaDoPassageiro(Passageiro* p) {
+    for (Viagem* v : viagens) {
+        if (v->isFinalizada()) continue;   
+        for (Passageiro* px : v->getPassageiros()) {
+            if (px == p) return v;        
+        }
+    }
+    return nullptr;
+}
+
+Viagem* ControladorDeTransito::viagemAtivaDoTransporte(Transporte* t) {
+    for (Viagem* v : viagens)
+        if (!v->isFinalizada() && v->getTransporte() == t) return v;
+    return nullptr;
+}
+
 // ------------------------------------------------------------------
 // Cadastros
 // ------------------------------------------------------------------
@@ -170,6 +186,11 @@ bool ControladorDeTransito::iniciarViagem(const std::string& nomeTransporte,
         return false;
     }
 
+    if (viagemAtivaDoTransporte(transporte) != nullptr) {
+        std::cout << "[ERRO] O transporte \"" << nomeTransporte  << "\" ja esta em uma viagem em andamento.\n";
+        return false;
+    }
+
     if (transporte->getLocalAtual() != origem) {
         std::cout << "[ERRO] O transporte \"" << nomeTransporte
                   << "\" nao esta na cidade de origem (esta em "
@@ -193,6 +214,10 @@ bool ControladorDeTransito::iniciarViagem(const std::string& nomeTransporte,
         Passageiro* p = buscarPassageiro(nome);
         if (p == nullptr) {
             std::cout << "[ERRO] Passageiro \"" << nome << "\" nao encontrado.\n";
+            return false;
+        }
+        if (viagemAtivaDoPassageiro(p) != nullptr) {
+            std::cout << "[ERRO] O passageiro \"" << nome << "\" ja esta em uma viagem em andamento.\n";
             return false;
         }
         if (p->getLocalAtual() != origem) {
@@ -236,4 +261,30 @@ void ControladorDeTransito::avancarHoras(int horas) {
         }
     }
     std::cout << horas << " hora(s) avancada(s).\n";
+}
+
+// ------------------------------------------------------------------
+// Consultas e relatorios
+// ------------------------------------------------------------------
+
+void ControladorDeTransito::relatarPassageiros() {
+    std::cout << "\n===== ONDE ESTA CADA PASSAGEIRO =====\n";
+    if (passageiros.empty()) {
+        std::cout << "Nenhum passageiro cadastrado.\n";
+        return;
+    }
+    for (Passageiro* p : passageiros) {
+        Viagem* v = viagemAtivaDoPassageiro(p);
+        if (v == nullptr) {
+            // Nao esta em nenhuma viagem: esta na cidade do localAtual
+            std::cout << "- " << p->getNome() << ": em "
+                      << p->getLocalAtual()->getNome() << "\n";
+        } else {
+            // Em transito: origem, destino e transporte vem da viagem
+            std::cout << "- " << p->getNome() << ": em transito ("
+                      << v->getOrigem()->getNome() << " -> "
+                      << v->getDestino()->getNome()
+                      << ", transporte: " << v->getTransporte()->getNome() << ")\n";
+        }
+    }
 }
