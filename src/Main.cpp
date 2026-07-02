@@ -31,6 +31,7 @@ int main() {
                   << "7 - Relatorio: onde esta cada passageiro\n"
                   << "8 - Relatorio onde esta cada Transporte\n"
                   << "9 - Relatar viagens em andamento\n"
+                  << "10 - Relatar cidades mais visitadas\n"
                   << "0 - Sair\n";
         std::string opcao = lerLinha("Escolha: ");
 
@@ -85,6 +86,9 @@ int main() {
         
         } else if(opcao == "9") {
             controlador.relatarViagensEmAndamento();
+
+        } else if(opcao == "10") {
+            controlador.relatarCidadesMaisVisitadas();
 
         } else if (opcao == "0") {
             executando = false;

@@ -55,10 +55,10 @@ public:
     // ---- Consultas e relatorios ----
     
     void relatarPassageiros();
-
     void relatarTransportes();
-
     void relatarViagensEmAndamento();
+    void relatarCidadesMaisVisitadas();
+    
 };
 
 #endif

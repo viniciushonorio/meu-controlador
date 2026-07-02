@@ -1,5 +1,6 @@
 #include "ControladorDeTransito.hpp"
 #include <iostream>
+#include <algorithm>
 
 // ------------------------------------------------------------------
 // Buscas auxiliares
@@ -337,5 +338,22 @@ void ControladorDeTransito::relatarViagensEmAndamento() {
 
     if (!alguma) {
         std::cout << "Nenhuma viagem em andamento.\n";
+    }
+}
+
+void ControladorDeTransito::relatarCidadesMaisVisitadas() {
+    std::cout << "\n===== CIDADES MAIS VISITADAS =====\n";
+    if (cidades.empty()) {
+        std::cout << "Nenhuma cidade cadastrada.\n";
+        return;
+    }
+
+    // Ordena uma COPIA do vector (o original fica intacto)
+    std::vector<Cidade*> ordenadas = cidades;
+    std::sort(ordenadas.begin(), ordenadas.end(),
+              [](Cidade* a, Cidade* b) { return a->getVisitas() > b->getVisitas(); });
+
+    for (Cidade* c : ordenadas) {
+        std::cout << "- " << c->getNome() << ": " << c->getVisitas() << " visita(s)\n";
     }
 }
