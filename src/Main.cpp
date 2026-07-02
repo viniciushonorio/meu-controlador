@@ -1,30 +1,30 @@
 #include <iostream>
-#include "Cidade.hpp"
-#include "Passageiro.hpp"
-#include "Trajeto.hpp"
-#include "Transporte.hpp"
+#include <string>
+#include "ControladorDeTransito.hpp"
 
 int main() {
-    // Cidades
-    Cidade natal("Natal");
-    Cidade mossoro("Mossoro");
+    ControladorDeTransito controlador;
+    bool executando = true;
 
-    // Transporte terrestre comecando em Natal
-    // (nome, tipo, capacidade, velocidade, distEntreDescansos, tempoDescanso, local)
-    Transporte onibus("Onibus Expresso", 'T', 40, 70, 300, 2, &natal);
+    while (executando) {
+        std::cout << "\n=== CONTROLADOR DE VIAGENS ===\n"
+                  << "1 - Cadastrar cidade\n"
+                  << "0 - Sair\n"
+                  << "Escolha: ";
 
-    std::cout << "Transporte: " << onibus.getNome()
-              << " | tipo: " << onibus.getTipo()
-              << " | capacidade: " << onibus.getCapacidade()
-              << " | velocidade: " << onibus.getVelocidade() << " km/h\n";
-    std::cout << "Descansa " << onibus.getTempoDescanso()
-              << "h a cada " << onibus.getDistanciaEntreDescansos() << " km\n";
-    std::cout << "Local atual: " << onibus.getLocalAtual()->getNome() << "\n";
+        std::string opcao;
+        std::getline(std::cin, opcao);
 
-    // Simula o efeito de uma viagem: o transporte muda de cidade
-    onibus.setLocalAtual(&mossoro);
-    std::cout << "Apos viajar, local atual: "
-              << onibus.getLocalAtual()->getNome() << "\n";
-
+        if (opcao == "1") {
+            std::cout << "Nome da cidade: ";
+            std::string nome;
+            std::getline(std::cin, nome);
+            controlador.cadastrarCidade(nome);
+        } else if (opcao == "0") {
+            executando = false;
+        } else {
+            std::cout << "Opcao invalida.\n";
+        }
+    }
     return 0;
 }
