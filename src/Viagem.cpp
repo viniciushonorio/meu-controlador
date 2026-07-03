@@ -3,7 +3,7 @@
 Viagem::Viagem(Transporte* transporte, std::vector<Passageiro*> passageiros,
                Cidade* origem, Cidade* destino, int distancia)
     : transporte(transporte), passageiros(passageiros), origem(origem),
-      destino(destino), distancia(distancia), distanciaPercorrida(0),
+      destino(destino), distancia(distancia), proxima(nullptr), distanciaPercorrida(0),
       kmDesdeUltimoDescanso(0), horasDescansoRestantes(0),
       horasEmTransito(0), emAndamento(false), finalizada(false) {}
 
@@ -11,37 +11,71 @@ void Viagem::iniciarViagem() {
     emAndamento = true;
 }
 
-void Viagem::avancarHoras(int horas) {
-    for (int h = 0; h < horas; h++) {
-        if (finalizada) break;
+void Viagem::setProxima(Viagem* v) {
+    proxima = v;
+}
 
-        horasEmTransito++;
+Viagem* Viagem::getProxima() const {
+    return proxima;
+}
 
-        if (horasDescansoRestantes > 0) {
-            horasDescansoRestantes--; 
-            continue;
-        }
+Viagem* Viagem::trechoAtual() {
+    if (!finalizada) return this;
+    if (proxima != nullptr) return proxima->trechoAtual();
+    return nullptr;
+}
 
-        distanciaPercorrida += transporte->getVelocidade();
-        kmDesdeUltimoDescanso += transporte->getVelocidade();
+bool Viagem::cadeiaFinalizada() const {
+    if (!finalizada) return false;                       // eu nem acabei
+    if (proxima != nullptr) return proxima->cadeiaFinalizada();  // eu sim; e o resto?
+    return true;                                         // acabei e sou o ultimo
+}
 
-        if (distanciaPercorrida >= distancia) {
-            distanciaPercorrida = distancia;
-            emAndamento = false;
-            finalizada = true;
+Cidade* Viagem::getDestinoFinal() const {
+    if (proxima != nullptr) return proxima->getDestinoFinal();
+    return destino;
+}
+
+void Viagem::avancarUmaHora() {
+    horasEmTransito++;
+
+    if (horasDescansoRestantes > 0) {
+        horasDescansoRestantes--;
+        return;
+    }
+
+    distanciaPercorrida += transporte->getVelocidade();
+    kmDesdeUltimoDescanso += transporte->getVelocidade();
+
+    if (distanciaPercorrida >= distancia) {
+        distanciaPercorrida = distancia;
+        emAndamento = false;
+        finalizada = true;
+
+        // SO o ultimo trecho da corrente move todo mundo (regra do enunciado!)
+        if (proxima == nullptr) {
             transporte->setLocalAtual(destino);
             for (Passageiro* p : passageiros) {
                 p->setLocalAtual(destino);
             }
             destino->registrarVisita();
-            continue;
         }
+        return;
+    }
 
-        if (transporte->getDistanciaEntreDescansos() > 0 &&
-            kmDesdeUltimoDescanso >= transporte->getDistanciaEntreDescansos()) {
-            horasDescansoRestantes = transporte->getTempoDescanso();
-            kmDesdeUltimoDescanso = 0;
-        }
+    if (transporte->getDistanciaEntreDescansos() > 0 &&
+        kmDesdeUltimoDescanso >= transporte->getDistanciaEntreDescansos()) {
+        horasDescansoRestantes = transporte->getTempoDescanso();
+        kmDesdeUltimoDescanso = 0;
+    }
+}
+
+void Viagem::avancarHoras(int horas) {
+    for (int h = 0; h < horas; h++) {
+        Viagem* trecho = trechoAtual();
+        if (trecho == nullptr) break;               // corrente ja encerrada
+        if (!trecho->emAndamento) trecho->iniciarViagem();  // partida do trecho
+        trecho->avancarUmaHora();
     }
 }
 

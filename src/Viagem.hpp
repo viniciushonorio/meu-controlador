@@ -13,6 +13,7 @@ private:
     Cidade* origem;
     Cidade* destino;
     int distancia;              // km do trecho (vem do trajeto)
+    Viagem* proxima; 
 
     int distanciaPercorrida;    // comeca em 0, cresce a cada hora
     int kmDesdeUltimoDescanso;  // km acumulados desde o último descanso
@@ -21,21 +22,31 @@ private:
     bool emAndamento;
     bool finalizada;
 
+    void avancarUmaHora();   // avanca 1 hora SOMENTE neste trecho
+
 public:
     Viagem(Transporte* transporte, std::vector<Passageiro*> passageiros,
            Cidade* origem, Cidade* destino, int distancia);
 
+    void setProxima(Viagem* v);
+    Viagem* getProxima() const;
+    
     // Marca este trecho como em andamento (registra a partida)
     void iniciarViagem();
 
     // Avança 'horas' horas na CADEIA inteira (deve ser chamado na cabeça)
     void avancarHoras(int horas);
 
+    // Primeiro trecho ainda não finalizado da cadeia (nullptr se tudo acabou)
+    Viagem* trechoAtual();
+
     bool isEmAndamento() const;
     bool isFinalizada() const;      // este trecho
+    bool cadeiaFinalizada() const;  // todos os trechos
 
     Cidade* getOrigem() const;
     Cidade* getDestino() const;
+    Cidade* getDestinoFinal() const;  // destino do ultimo trecho
     Transporte* getTransporte() const;
     const std::vector<Passageiro*>& getPassageiros() const;
 
