@@ -33,6 +33,7 @@ void Viagem::avancarHoras(int horas) {
             for (Passageiro* p : passageiros) {
                 p->setLocalAtual(destino);
             }
+            destino->registrarVisita();
             continue;
         }
 
