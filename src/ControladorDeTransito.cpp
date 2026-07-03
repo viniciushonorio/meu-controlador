@@ -34,7 +34,7 @@ Transporte* ControladorDeTransito::buscarTransporte(const std::string& nome) {
 
 Viagem* ControladorDeTransito::viagemAtivaDoPassageiro(Passageiro* p) {
     for (Viagem* v : viagens) {
-        if (v->isFinalizada()) continue;   
+        if (v->cadeiaFinalizada()) continue;   
         for (Passageiro* px : v->getPassageiros()) {
             if (px == p) return v;        
         }
@@ -44,7 +44,7 @@ Viagem* ControladorDeTransito::viagemAtivaDoPassageiro(Passageiro* p) {
 
 Viagem* ControladorDeTransito::viagemAtivaDoTransporte(Transporte* t) {
     for (Viagem* v : viagens)
-        if (!v->isFinalizada() && v->getTransporte() == t) return v;
+        if (!v->cadeiaFinalizada() && v->getTransporte() == t) return v;
     return nullptr;
 }
 
@@ -235,34 +235,41 @@ bool ControladorDeTransito::iniciarViagem(const std::string& nomeTransporte,
         listaPassageiros.push_back(p);
     }
 
-    // ----- Procurar trajeto direto compatível:
-    Trajeto* trajetoEscolhido = nullptr;
-    for (Trajeto* t : trajetos) {
-        if (t->getOrigem() == origem && t->getDestino() == destino
-            && t->getTipo() == transporte->getTipo()) {
-            trajetoEscolhido = t;
-            break;
-        }
-    }
-    if (trajetoEscolhido == nullptr) {                     
-        std::cout << "[ERRO] Nao existe trajeto direto compativel entre "
-                  << nomeOrigem << " e " << nomeDestino << ".\n";
+    // --- Verifica se a viagem e possivel (direta ou com conexoes) ---
+    std::vector<Trajeto*> caminho =
+        calcularMelhorTrajeto(origem, destino, transporte->getTipo());
+
+    if (caminho.empty()) {
+        std::cout << "[ERRO] Nao existe caminho "
+                  << (transporte->getTipo() == 'A' ? "aquatico" : "terrestre")
+                  << " entre " << nomeOrigem << " e " << nomeDestino
+                  << ". Viagem nao permitida.\n";
         return false;
     }
 
-    Viagem* v = new Viagem(transporte, listaPassageiros,
-                origem, destino, trajetoEscolhido->getDistancia());
-    v->iniciarViagem();
-    viagens.push_back(v);
+    // --- Monta a corrente: uma Viagem por trecho do caminho ---
+    Viagem* cabeca = nullptr;
+    Viagem* ultima = nullptr;
+    for (Trajeto* t : caminho) {
+        Viagem* v = new Viagem(transporte, listaPassageiros,
+                               t->getOrigem(), t->getDestino(), t->getDistancia());
+        if (cabeca == nullptr) cabeca = v;   // primeiro elo: vira a cabeca
+        else ultima->setProxima(v);          // demais: emenda no anterior
+        ultima = v;
+    }
+
+    cabeca->iniciarViagem();       // registra a partida do primeiro trecho
+    viagens.push_back(cabeca);     // o vector guarda so a CABECA da corrente
 
     std::cout << "Viagem iniciada: " << nomeOrigem << " -> " << nomeDestino
-              << " com o transporte \"" << nomeTransporte << "\".\n";
-    return true;                                           
+              << " com o transporte \"" << nomeTransporte << "\" ("
+              << caminho.size() << " trecho(s)).\n";
+    return true;                                          
 }
 
 void ControladorDeTransito::avancarHoras(int horas) {
     for (Viagem* v : viagens) {
-        if (!v->isFinalizada()) {
+        if (!v->cadeiaFinalizada()) {
             v->avancarHoras(horas);
         }
     }
@@ -287,7 +294,7 @@ void ControladorDeTransito::relatarPassageiros() {
                       << p->getLocalAtual()->getNome() << "\n";
         } else {
             // Em transito: origem, destino e transporte vem da viagem
-            std::cout << "- " << p->getNome() << ": em transito (" << v->getOrigem()->getNome() << " -> " << v->getDestino()->getNome() << ", transporte: " << v->getTransporte()->getNome() << ")\n";
+            std::cout << "- " << p->getNome() << ": em transito (" << v->getOrigem()->getNome() << " -> " << v->getDestinoFinal()->getNome() << ", transporte: " << v->getTransporte()->getNome() << ")\n";
         }
     }
 }
@@ -306,7 +313,7 @@ void ControladorDeTransito::relatarTransportes() {
         } else {
             std::cout << "- " << t->getNome() << ": em transito ("
                       << v->getOrigem()->getNome() << " -> "
-                      << v->getDestino()->getNome() << ") ["
+                      << v->getDestinoFinal()->getNome() << ") ["
                       << v->getDistanciaPercorrida() << "/"
                       << v->getDistancia() << " km]\n";
         }
@@ -319,12 +326,12 @@ void ControladorDeTransito::relatarViagensEmAndamento() {
     bool alguma = false;  // o bilhete: alguem foi impresso?
 
     for (Viagem* v : viagens) {
-        if (v->isFinalizada()) continue;  // so nos interessam as ativas
+        if (v->cadeiaFinalizada()) continue;  // so nos interessam as ativas
         alguma = true;
 
         // Linha principal: rota e transporte
         std::cout << "- " << v->getOrigem()->getNome() << " -> "
-                  << v->getDestino()->getNome()
+                  << v->getDestinoFinal()->getNome()
                   << " | transporte: " << v->getTransporte()->getNome()
                   << " | passageiros: ";
 
@@ -335,10 +342,17 @@ void ControladorDeTransito::relatarViagensEmAndamento() {
             if (i + 1 < ps.size()) std::cout << ", ";
         }
 
-        // Linha secundaria: tempo e progresso
-        std::cout << "\n    horas em transito: " << v->getHorasEmTransito()
-                  << " | progresso: " << v->getDistanciaPercorrida()
-                  << "/" << v->getDistancia() << " km\n";
+        // Linha secundaria: tempo e trecho atual da corrente
+        std::cout << "\n    horas em transito: " << v->getHorasEmTransito();
+        Viagem* trecho = v->trechoAtual();
+        if (trecho != nullptr) {
+            std::cout << " | trecho atual: " << trecho->getOrigem()->getNome()
+                      << " -> " << trecho->getDestino()->getNome()
+                      << " [" << trecho->getDistanciaPercorrida() << "/"
+                      << trecho->getDistancia() << " km]";
+        }
+        std::cout << "\n";
+        
     }
 
     if (!alguma) {
