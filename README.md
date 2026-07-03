@@ -15,13 +15,13 @@ Requisitos: `g++` (C++17) e `make`.
 
 Isso gera o executável `controlador`. Para compilar sem make:
 
-g++ -std=c++17 -Wall -Wextra src/*.cpp -o controlador
+`g++ -std=c++17 -Wall -Wextra src/*.cpp -o controlador`
 
 Para limpar os arquivos de compilação: `make clean`
 
 ## Como executar
 
-./controlador
+`./controlador`
 
 Ao iniciar, o sistema carrega automaticamente os dados salvos na execução
 anterior (se existirem) e exibe o menu principal.
