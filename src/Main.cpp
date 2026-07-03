@@ -33,6 +33,7 @@ int main() {
                   << "8 - Relatorio onde esta cada Transporte\n"
                   << "9 - Relatar viagens em andamento\n"
                   << "10 - Relatar cidades mais visitadas\n"
+                  << "11 - Consultar melhor trajeto entre cidades\n"
                   << "0 - Salvar e sair\n";
         std::string opcao = lerLinha("Escolha: ");
 
@@ -91,6 +92,11 @@ int main() {
         } else if(opcao == "10") {
             controlador.relatarCidadesMaisVisitadas();
 
+        } else if (opcao == "11") {
+            std::string origem = lerLinha("Cidade de origem: ");
+            std::string destino = lerLinha("Cidade de destino: ");
+            char tipo = lerLinha("Tipo (A = Aquatico, T = Terrestre): ")[0];
+            controlador.consultarMelhorTrajeto(origem, destino, tipo);
         } else if (opcao == "0") {
             controlador.salvarDados();
             executando = false;

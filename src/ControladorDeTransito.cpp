@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <map>
+#include <set>
+#include <climits>
 
 // ------------------------------------------------------------------
 // Buscas auxiliares
@@ -466,4 +469,53 @@ void ControladorDeTransito::carregarDados() {
     std::cout << "Dados carregados: " << cidades.size() << " cidade(s), "
               << trajetos.size() << " trajeto(s), " << transportes.size()
               << " transporte(s), " << passageiros.size() << " passageiro(s).\n";
+}
+
+//----- calcula o melhor trajeto atraves de Dijkstra ------
+
+std::vector<Trajeto*> ControladorDeTransito::calcularMelhorTrajeto(
+        Cidade* origem, Cidade* destino, char tipo) {
+
+    std::map<Cidade*, int> dist;
+    std::map<Cidade*, Trajeto*> anterior;
+    std::set<Cidade*> visitadas;
+
+    for (Cidade* c : cidades) dist[c] = INT_MAX;   
+    dist[origem] = 0;                              
+
+    while (true) {
+        Cidade* atual = nullptr;
+        int menor = INT_MAX;
+        for (Cidade* c : cidades) {
+            if (visitadas.count(c) == 0 && dist[c] < menor) {
+                menor = dist[c];
+                atual = c;
+            }
+        }
+
+        if (atual == nullptr) break;   
+        visitadas.insert(atual);       
+        if (atual == destino) break;   
+
+        for (Trajeto* t : trajetos) {
+            if (t->getOrigem() == atual && t->getTipo() == tipo) {
+                int novaDist = dist[atual] + t->getDistancia();
+                if (novaDist < dist[t->getDestino()]) {
+                    dist[t->getDestino()] = novaDist;
+                    anterior[t->getDestino()] = t;
+                }
+            }
+        }
+    }
+
+    std::vector<Trajeto*> caminho;
+    if (dist[destino] == INT_MAX) return caminho;
+    Cidade* c = destino;
+    while (c != origem) {
+        Trajeto* t = anterior[c];
+        caminho.push_back(t);
+        c = t->getOrigem();
+    }
+    std::reverse(caminho.begin(), caminho.end());
+    return caminho;
 }

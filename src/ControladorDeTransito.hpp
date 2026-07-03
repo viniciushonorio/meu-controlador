@@ -60,9 +60,12 @@ public:
     void relatarCidadesMaisVisitadas();
 
     // ---- Persistencia em arquivos de texto ----
-    
+
     void salvarDados();
     void carregarDados();
+    
+    // ----- Calculo melhor trajeto -----------
+    std::vector<Trajeto*> calcularMelhorTrajeto(Cidade* origem, Cidade* destino, char tipo);
 };
 
 #endif
