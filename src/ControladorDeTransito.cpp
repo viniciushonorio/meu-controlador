@@ -519,3 +519,33 @@ std::vector<Trajeto*> ControladorDeTransito::calcularMelhorTrajeto(
     std::reverse(caminho.begin(), caminho.end());
     return caminho;
 }
+
+void ControladorDeTransito::consultarMelhorTrajeto(const std::string& nomeOrigem,
+                                                   const std::string& nomeDestino,
+                                                   char tipo) {
+    Cidade* origem = buscarCidade(nomeOrigem);
+    Cidade* destino = buscarCidade(nomeDestino);
+    if (origem == nullptr || destino == nullptr) {
+        std::cout << "[ERRO] Cidade de origem ou destino nao encontrada.\n";
+        return;
+    }
+
+    std::vector<Trajeto*> caminho = calcularMelhorTrajeto(origem, destino, tipo);
+
+    if (caminho.empty()) {
+        std::cout << "Nao existe caminho "
+                  << (tipo == 'A' ? "aquatico" : "terrestre")
+                  << " entre " << nomeOrigem << " e " << nomeDestino << ".\n";
+        return;
+    }
+
+    std::cout << "Melhor trajeto de " << nomeOrigem << " para " << nomeDestino << ":\n";
+    int total = 0;
+    for (Trajeto* t : caminho) {
+        std::cout << "  " << t->getOrigem()->getNome() << " -> "
+                  << t->getDestino()->getNome()
+                  << " (" << t->getDistancia() << " km)\n";
+        total += t->getDistancia();
+    }
+    std::cout << "Distancia total: " << total << " km\n";
+}
