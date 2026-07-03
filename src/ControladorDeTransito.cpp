@@ -394,3 +394,76 @@ void ControladorDeTransito::salvarDados() {
 
     std::cout << "Dados salvos.\n";
 }
+
+void ControladorDeTransito::carregarDados() {
+    std::string linha;
+
+    // ---- Cidades (PRIMEIRO: todos os outros dependem delas) ----
+    std::ifstream fc("cidades.txt");
+    while (std::getline(fc, linha)) {
+        if (linha.empty()) continue;
+        std::stringstream ss(linha);
+        std::string nome, visitasStr;
+        std::getline(ss, nome, ';');
+        std::getline(ss, visitasStr, ';');
+        cidades.push_back(new Cidade(nome, std::stoi(visitasStr)));
+    }
+    fc.close();
+
+    // ---- Trajetos (nomes -> ponteiros via buscarCidade) ----
+    std::ifstream ft("trajetos.txt");
+    while (std::getline(ft, linha)) {
+        if (linha.empty()) continue;
+        std::stringstream ss(linha);
+        std::string origem, destino, tipoStr, distStr;
+        std::getline(ss, origem, ';');
+        std::getline(ss, destino, ';');
+        std::getline(ss, tipoStr, ';');
+        std::getline(ss, distStr, ';');
+        Cidade* co = buscarCidade(origem);
+        Cidade* cd = buscarCidade(destino);
+        if (co != nullptr && cd != nullptr)
+            trajetos.push_back(new Trajeto(co, cd, tipoStr[0], std::stoi(distStr)));
+    }
+    ft.close();
+
+    // ---- Transportes ----
+    std::ifstream fr("transportes.txt");
+    while (std::getline(fr, linha)) {
+        if (linha.empty()) continue;
+        std::stringstream ss(linha);
+        std::string nome, tipoStr, capStr, velStr, distDescStr, tempoDescStr, cidadeStr;
+        std::getline(ss, nome, ';');
+        std::getline(ss, tipoStr, ';');
+        std::getline(ss, capStr, ';');
+        std::getline(ss, velStr, ';');
+        std::getline(ss, distDescStr, ';');
+        std::getline(ss, tempoDescStr, ';');
+        std::getline(ss, cidadeStr, ';');
+        Cidade* c = buscarCidade(cidadeStr);
+        if (c != nullptr)
+            transportes.push_back(new Transporte(nome, tipoStr[0],
+                                                 std::stoi(capStr), std::stoi(velStr),
+                                                 std::stoi(distDescStr), std::stoi(tempoDescStr),
+                                                 c));
+    }
+    fr.close();
+
+    // ---- Passageiros ----
+    std::ifstream fp("passageiros.txt");
+    while (std::getline(fp, linha)) {
+        if (linha.empty()) continue;
+        std::stringstream ss(linha);
+        std::string nome, cidadeStr;
+        std::getline(ss, nome, ';');
+        std::getline(ss, cidadeStr, ';');
+        Cidade* c = buscarCidade(cidadeStr);
+        if (c != nullptr)
+            passageiros.push_back(new Passageiro(nome, c));
+    }
+    fp.close();
+
+    std::cout << "Dados carregados: " << cidades.size() << " cidade(s), "
+              << trajetos.size() << " trajeto(s), " << transportes.size()
+              << " transporte(s), " << passageiros.size() << " passageiro(s).\n";
+}

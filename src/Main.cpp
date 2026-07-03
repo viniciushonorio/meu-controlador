@@ -18,6 +18,7 @@ int lerInteiro(const std::string& mensagem) {
 
 int main() {
     ControladorDeTransito controlador;
+    controlador.carregarDados();
     bool executando = true;
 
     while (executando) {
