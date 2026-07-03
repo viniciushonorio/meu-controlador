@@ -33,6 +33,7 @@ private:
     Viagem* viagemAtivaDoPassageiro(Passageiro* p);
 
 public:
+    ~ControladorDeTransito();
     // ---- Cadastros (retornam false e imprimem erro em caso de falha) ----
     bool cadastrarCidade(const std::string& nome);
 

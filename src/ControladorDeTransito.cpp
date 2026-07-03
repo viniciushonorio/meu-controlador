@@ -7,6 +7,14 @@
 #include <set>
 #include <climits>
 
+ControladorDeTransito::~ControladorDeTransito() {
+       for (Viagem* v : viagens) delete v;
+       for (Cidade* c : cidades) delete c;
+       for (Trajeto* t : trajetos) delete t;
+       for (Transporte* t : transportes) delete t;
+       for (Passageiro* p : passageiros) delete p;
+   }
+
 // ------------------------------------------------------------------
 // Buscas auxiliares
 // ------------------------------------------------------------------
@@ -352,7 +360,7 @@ void ControladorDeTransito::relatarViagensEmAndamento() {
                       << trecho->getDistancia() << " km]";
         }
         std::cout << "\n";
-        
+
     }
 
     if (!alguma) {

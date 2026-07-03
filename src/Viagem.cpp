@@ -7,6 +7,10 @@ Viagem::Viagem(Transporte* transporte, std::vector<Passageiro*> passageiros,
       kmDesdeUltimoDescanso(0), horasDescansoRestantes(0),
       horasEmTransito(0), emAndamento(false), finalizada(false) {}
 
+Viagem::~Viagem() {
+       delete proxima;
+}
+
 void Viagem::iniciarViagem() {
     emAndamento = true;
 }

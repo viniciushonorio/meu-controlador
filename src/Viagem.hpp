@@ -27,7 +27,8 @@ private:
 public:
     Viagem(Transporte* transporte, std::vector<Passageiro*> passageiros,
            Cidade* origem, Cidade* destino, int distancia);
-
+    ~Viagem();
+    
     void setProxima(Viagem* v);
     Viagem* getProxima() const;
     
