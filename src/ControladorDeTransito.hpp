@@ -58,7 +58,11 @@ public:
     void relatarTransportes();
     void relatarViagensEmAndamento();
     void relatarCidadesMaisVisitadas();
+
+    // ---- Persistencia em arquivos de texto ----
     
+    void salvarDados();
+    void carregarDados();
 };
 
 #endif

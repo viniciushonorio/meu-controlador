@@ -1,6 +1,8 @@
 #include "ControladorDeTransito.hpp"
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 // ------------------------------------------------------------------
 // Buscas auxiliares
@@ -356,4 +358,39 @@ void ControladorDeTransito::relatarCidadesMaisVisitadas() {
     for (Cidade* c : ordenadas) {
         std::cout << "- " << c->getNome() << ": " << c->getVisitas() << " visita(s)\n";
     }
+}
+
+// ------------------------------------------------------------------
+// Persistencia em arquivos de texto (campos separados por ';')
+// ------------------------------------------------------------------
+
+void ControladorDeTransito::salvarDados() {
+    // cidades.txt -> nome;visitas
+    std::ofstream fc("cidades.txt");
+    for (Cidade* c : cidades)
+        fc << c->getNome() << ";" << c->getVisitas() << "\n";
+    fc.close();
+
+    // trajetos.txt -> origem;destino;tipo;distancia
+    std::ofstream ft("trajetos.txt");
+    for (Trajeto* t : trajetos)
+        ft << t->getOrigem()->getNome() << ";" << t->getDestino()->getNome()
+           << ";" << t->getTipo() << ";" << t->getDistancia() << "\n";
+    ft.close();
+
+    // transportes.txt -> nome;tipo;capacidade;velocidade;distDescanso;tempoDescanso;cidade
+    std::ofstream fr("transportes.txt");
+    for (Transporte* t : transportes)
+        fr << t->getNome() << ";" << t->getTipo() << ";" << t->getCapacidade()
+           << ";" << t->getVelocidade() << ";" << t->getDistanciaEntreDescansos()
+           << ";" << t->getTempoDescanso() << ";" << t->getLocalAtual()->getNome() << "\n";
+    fr.close();
+
+    // passageiros.txt -> nome;cidade
+    std::ofstream fp("passageiros.txt");
+    for (Passageiro* p : passageiros)
+        fp << p->getNome() << ";" << p->getLocalAtual()->getNome() << "\n";
+    fp.close();
+
+    std::cout << "Dados salvos.\n";
 }
